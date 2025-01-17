@@ -3,32 +3,42 @@ import { BrowserRouter } from 'react-router-dom';
 import InstructionModal from './components/InstructionModal';
 import GameTable from './components/GameTable';
 import { Typography, TextField, Button, Autocomplete } from '@mui/material';
-import { getSearchResults } from './api';
+import { getSearchResults, postGuess } from './api';
 
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [inputText, setInputText] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [guesses, setGuesses] = useState([]);
 
-  const handleLookUp = (e) => {
-    // const newInputText = e.target.value;
-    // console.log(newInputText);
-    // setInputText(newInputText);
-    // if (newInputText) {
-    //   getSearchResults(newInputText).then((res) => {
-    //     console.log('handle lookup', res.data);
-    //     setSearchResults(res.data);
-    //   });
-    // }
-    setInputText(e.target.value);
+  const handleLookUp = (e, newValue) => {
+    const value = newValue || '';
+    setInputText(value);
   };
+
+  const makeGuess = (e) => {
+    // some logic to ensure inputText isnt empty
+    // you already guessed that logic?
+    // guess with no match logic
+    postGuess({ guess: inputText }).then((res) => {
+      if (res.data) {
+        console.log('Guess submitted', res.data);
+        setGuesses([...guesses, res.data]);
+      }
+    });
+  };
+
+  useEffect(() => {
+    console.log('Guesses updated:', guesses);
+  }, [guesses]);
 
   useEffect(() => {
     if (inputText) {
       getSearchResults(inputText).then((res) => {
-        console.log('USE EFFECT', res.data);
         setSearchResults(res.data);
       });
+    } else {
+      setSearchResults([]);
     }
   }, [inputText]);
   
@@ -48,7 +58,6 @@ function App() {
           gap: 25,
         }}
       >
-        
         <Typography 
           variant="h1"
           sx={{ 
@@ -60,30 +69,58 @@ function App() {
         >
           STATLE
         </Typography>
-        <TextField
-          label="Enter a state"
+        <Autocomplete
+          freeSolo
+          disableClearable
+          inputValue={inputText}
+          onInputChange={handleLookUp}
           value={inputText}
-          variant="outlined"
           onChange={handleLookUp}
+          options={searchResults.map((state) => state.name)}
           sx={{
-            width: '20%',
-            '& .MuiFormLabel-root': {
-              color: 'white', // Label color
-            },
-            '& .MuiFormLabel-root.Mui-focused': {
-              color: 'white', // Label color when focused
-            },
-            '& .MuiInputBase-input': {
+            width: '25%',
+            '& .MuiAutocomplete-inputRoot': {
               color: 'white', // Text color
               backgroundColor: 'rgb(50, 50, 50)', // Input field background color
             },
-            '& .MuiOutlinedInput-root fieldset': {
-              borderColor: 'white', // Outline color
-            },
-            '& .MuiOutlinedInput-root.Mui-focused fieldset': {
-              borderColor: 'white', // Outline color when focused
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: 'white', // Outline color
+              },
+              '&:hover fieldset': {
+                borderColor: 'white', // Outline color on hover
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: 'white', // Outline color when focused
+              },
             },
           }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Enter a state"
+              variant="outlined"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  makeGuess(e);
+                }
+              }}
+
+              sx={{
+                width: '100%',
+                '& .MuiFormLabel-root': {
+                  color: 'white', // Label color
+                },
+                '& .MuiFormLabel-root.Mui-focused': {
+                  color: 'white', // Label color when focused
+                },
+                '& .MuiInputBase-input': {
+                  color: 'white', // Text color
+                  backgroundColor: 'rgb(50, 50, 50)', // Input field background color
+                },
+              }}
+            />
+          )}
         />
         <Button
           variant='contained'

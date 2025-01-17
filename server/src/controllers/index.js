@@ -3,7 +3,6 @@ import prisma from '../prismaClient.js';
 export const getSearchResults = async (req, res, next) => {
     try {
         const { query } = req.query;
-        console.log(query);
         const results = await prisma.state.findMany({
             where: { 
                 name: { 
@@ -21,7 +20,15 @@ export const getSearchResults = async (req, res, next) => {
 export const postGuess = async (req, res, next) => {
     try {
         const { guess } = req.body;
-        // const searchResults = await Search.find
+        const guessResult = await prisma.state.findFirst({
+            where: { 
+                name: {
+                    equals: guess,
+                    mode: 'insensitive',
+                }, 
+            },
+        });
+        res.json(guessResult);
     } catch (error) {
         return next(error);
     }
