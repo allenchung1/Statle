@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableRow, Paper, TableContainer } from '@mui/material';
 
-const GameTable = () => {
+const GameTable = ({ guesses }) => {
   const GameTableHeader = () => {
     return (
       <TableHead>
@@ -18,13 +18,15 @@ const GameTable = () => {
   const GameTableBody = () => {
     return (
       <TableBody>
-        <TableRow sx={{ backgroundColor: 'black', height: 100, border: '2px solid white' }}>
-          <TableCell align="center" sx={{  color: 'white', fontSize: 30, fontWeight: 'bold' }}>Alabama</TableCell>
-          <TableCell align="center" sx={{ color: 'white', fontSize: 30, fontWeight: 'bold' }}>4903185</TableCell>
-          <TableCell align="center" sx={{ color: 'white', fontSize: 30, fontWeight: 'bold' }}>52420</TableCell>
-          <TableCell align="center" sx={{ color: 'white', fontSize: 30, fontWeight: 'bold' }}>210000</TableCell>
-          <TableCell align="center" sx={{ color: 'white', fontSize: 30, fontWeight: 'bold' }}>South</TableCell>
-        </TableRow>
+        {guesses.map((guess, index) => (
+          <TableRow key={index} sx={{ backgroundColor: 'black', height: 100, border: '2px solid white' }}>
+            <TableCell align="center" sx={{ color: 'white', fontSize: 30, fontWeight: 'bold' }}>{guess.name}</TableCell>
+            <TableCell align="center" sx={{ color: 'white', fontSize: 30, fontWeight: 'bold' }}>{guess.population}</TableCell>
+            <TableCell align="center" sx={{ color: 'white', fontSize: 30, fontWeight: 'bold' }}>{guess.size}</TableCell>
+            <TableCell align="center" sx={{ color: 'white', fontSize: 30, fontWeight: 'bold' }}>{guess.gdp}</TableCell>
+            <TableCell align="center" sx={{ color: 'white', fontSize: 30, fontWeight: 'bold' }}>{guess.region}</TableCell>
+          </TableRow>
+        ))}
       </TableBody>
     );
   };

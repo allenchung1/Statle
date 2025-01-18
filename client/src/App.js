@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import InstructionModal from './components/InstructionModal';
+import { InstructionModal, WinModal } from './components/Modal';
 import GameTable from './components/GameTable';
 import { Typography, TextField, Button, Autocomplete } from '@mui/material';
 import { getSearchResults, postGuess } from './api';
 
 function App() {
-  const [isModalOpen, setIsModalOpen] = useState(true);
+  const [isInstructionModalOpen, setIsInstructionModalOpen] = useState(false);
+  const [isWinModalOpen, setIsWinModalOpen] = useState(false);
+  const [isLoseModalOpen, setIsLoseModalOpen] = useState(false);
   const [inputText, setInputText] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [guesses, setGuesses] = useState([]);
@@ -17,9 +19,6 @@ function App() {
   };
 
   const makeGuess = (e) => {
-    // some logic to ensure inputText isnt empty
-    // you already guessed that logic?
-    // guess with no match logic
     postGuess({ guess: inputText }).then((res) => {
       if (res.data) {
         console.log('Guess submitted', res.data);
@@ -29,7 +28,9 @@ function App() {
   };
 
   useEffect(() => {
-    console.log('Guesses updated:', guesses);
+    if (guesses.length === 5) {
+      setIsWinModalOpen(true);
+    }
   }, [guesses]);
 
   useEffect(() => {
@@ -42,6 +43,10 @@ function App() {
     }
   }, [inputText]);
   
+  useEffect(() => {
+    // choose a random state for the game
+    setIsInstructionModalOpen(true);
+  }, []);
 
   return (
     <BrowserRouter>
@@ -50,10 +55,8 @@ function App() {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          /*justifyContent: 'center',*/
           height: '100vh',
-          backgroundColor: 'rgb(30,40,40',
-          //backgroundColor: '#CCCCFF',
+          backgroundColor: 'rgb(30,40,40)',
           padding: 50,
           gap: 25,
         }}
@@ -124,7 +127,7 @@ function App() {
         />
         <Button
           variant='contained'
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => setIsInstructionModalOpen(true)}
           sx={{
             height: 50, 
             width: 150,
@@ -135,9 +138,9 @@ function App() {
         >
           GUESS
         </Button>
-        <InstructionModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-        <GameTable />
-        
+        <InstructionModal isOpen={isInstructionModalOpen} onClose={() => setIsInstructionModalOpen(false)} />
+        <GameTable guesses={guesses}/>
+        < WinModal isOpen={isWinModalOpen} onClose={() => setIsWinModalOpen(false)} />
       </div>
     </BrowserRouter>
   );
