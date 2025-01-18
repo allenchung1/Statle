@@ -15,7 +15,7 @@ const GameTable = ({ guesses }) => {
     );
   };
 
-  const GameTableBody = () => {
+  const GameTableBody = () => {//green: 0,100,0 yellow: 200,160,10
     return (
       <TableBody>
         {guesses.map((guess, index) => (
