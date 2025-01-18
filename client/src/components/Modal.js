@@ -80,7 +80,7 @@ export const WinModal = ({ isOpen, onClose }) => {
           Congratulations! You won!
         </Typography>
         <Link to="https://donorbox.org/keep-statle-alive-1" target="_blank" rel="noopener noreferrer">
-            <Button 
+          <Button 
             variant="contained" 
             sx={{ 
               height: '50px', 
@@ -94,10 +94,10 @@ export const WinModal = ({ isOpen, onClose }) => {
               },
             }}
             onClick={onClose}
-            >
-              DONATE!
-            </Button>
-          </Link>
+          >
+            DONATE!
+          </Button>
+        </Link>
       </Box>
     </Modal>
   )
@@ -111,7 +111,7 @@ export const LoseModal = ({ isOpen, onClose }) => {
           You lost! Better luck next time.
         </Typography>
         <Link to="https://donorbox.org/keep-statle-alive-1" target="_blank" rel="noopener noreferrer">
-            <Button 
+          <Button 
             variant="contained" 
             sx={{ 
               height: '50px', 
@@ -119,15 +119,16 @@ export const LoseModal = ({ isOpen, onClose }) => {
               fontSize: '25px', 
               backgroundColor: 'rgb(50, 100, 200)',
               color: 'white',
+              marginTop: 20,
               '&:hover': {
                 backgroundColor: 'rgb(30,40,40)',
               },
             }}
             onClick={onClose}
-            >
-              DONATE!
-            </Button>
-          </Link>
+          >
+            DONATE!
+          </Button>
+        </Link>
       </Box>
     </Modal>
   )

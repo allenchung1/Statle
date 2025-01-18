@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import { InstructionModal, WinModal } from './components/Modal';
+import { InstructionModal, LoseModal, WinModal } from './components/Modal';
 import GameTable from './components/GameTable';
 import { Typography, TextField, Button, Autocomplete } from '@mui/material';
-import { getSearchResults, postGuess, getGameStatus, postGame } from './api';
+import { getSearchResults, putGuess, getGameStatus, postGame } from './api';
 
 function App() {
   const [isInstructionModalOpen, setIsInstructionModalOpen] = useState(false);
@@ -12,6 +12,9 @@ function App() {
   const [inputText, setInputText] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [guesses, setGuesses] = useState([]);
+  const [gameId, setGameId] = useState(null);
+  const [win, setWin] = useState(false) // disable autocomplete
+  const [lose, setLose] = useState(false) // disable autocomplete
 
   const handleLookUp = (e, newValue) => {
     const value = newValue || '';
@@ -19,19 +22,20 @@ function App() {
   };
 
   const makeGuess = (e) => {
-    postGuess({ guess: inputText }).then((res) => {
+    putGuess({ guess: inputText, gameId: gameId }).then((res) => {
       if (res.data) {
+        if (res.data.correct == true)  {
+          setIsWinModalOpen(true)
+        } else if (res.data.updatedGame.guesses.length == 5) {
+          setIsLoseModalOpen(true)
+        }
         console.log('Guess submitted', res.data);
-        setGuesses([...guesses, res.data]);
+        console.log('test')
+        setGuesses([...guesses, res.data.guessResult]);
+        //setGuesses(res.data.guesses)
       }
     });
   };
-
-  useEffect(() => {
-    if (guesses.length === 5) {
-      setIsWinModalOpen(true);
-    }
-  }, [guesses]);
 
   useEffect(() => {
     if (inputText) {
@@ -46,7 +50,8 @@ function App() {
   useEffect(() => {
     // set up game: choose a random state for the game
     postGame().then((res) => {
-      console.log('Game started, this is the state:', res.data.state);
+      console.log('Game started, this is the game:', res.data);
+      setGameId(res.data.id)
     });
     setIsInstructionModalOpen(true);
   }, []);
@@ -143,7 +148,8 @@ function App() {
         </Button>
         <InstructionModal isOpen={isInstructionModalOpen} onClose={() => setIsInstructionModalOpen(false)} />
         <GameTable guesses={guesses}/>
-        < WinModal isOpen={isWinModalOpen} onClose={() => setIsWinModalOpen(false)} />
+        <WinModal isOpen={isWinModalOpen} onClose={() => setIsWinModalOpen(false)} />
+        <LoseModal isOpen={isLoseModalOpen} onClose={() => setIsLoseModalOpen(false)} />
       </div>
     </BrowserRouter>
   );

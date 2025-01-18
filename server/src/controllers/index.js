@@ -17,10 +17,11 @@ export const getSearchResults = async (req, res, next) => {
     }
 }
 
-export const postGuess = async (req, res, next) => { //put
+export const putGuess = async (req, res, next) => {
     try {
         // verify the guess
-        const { guess } = req.body;
+        const { guess, gameId } = req.body;
+        console.log('GAME ID:', gameId)
         const guessResult = await prisma.state.findFirst({
             where: { 
                 name: {
@@ -29,15 +30,26 @@ export const postGuess = async (req, res, next) => { //put
                 }, 
             },
         });
-        // submit the guess to the game model
-        // if (guessResult) {
-        //     const correct = await prisma.game.findFirst({
-        //         where: {
-        //             stateId: guessResult.id,
-        //         },
-        //     });
-        // }
-        res.json(guessResult);
+        if (!guessResult) {
+            return res.json(null)
+        }
+        //submit the guess to the game model and check if correct
+        const updatedGame = await prisma.game.update({
+            where: { id: gameId },
+            data: {
+                guesses: {
+                    push: guess
+                }
+            },
+            include: {
+                state: true
+            }
+        });
+        console.log(updatedGame)
+        if (guessResult.id === updatedGame.stateId) {
+            return res.json({ correct: true, guessResult, updatedGame })
+        }
+        res.status(201).json({ correct: false, guessResult, updatedGame });
     } catch (error) {
         return next(error);
     }
@@ -55,7 +67,6 @@ export const getGameStatus = async (req, res, next) => {
 export const postGame = async (req, res, next) => {
     try {
         await prisma.game.deleteMany();
-
         // const states = await prisma.state.findMany();
         // const randomState = states[Math.floor(Math.random() * states.length)];
         const randomState = await prisma.state.findFirst({
@@ -63,19 +74,19 @@ export const postGame = async (req, res, next) => {
         });
 
         const newGame = await prisma.game.create({
-            // data: {
-            //     state: {
-            //         connect: { id: randomState.id }
-            //     },
-            //     guesses: []
-            // }
             data: {
-                stateId: randomState.id, // Set the stateId directly
+                state: {
+                    connect: { id: randomState.id }
+                },
                 guesses: []
             },
-            include: {
-                state: true
-            }
+            // data: {
+            //     stateId: randomState.id, // Set the stateId directly
+            //     guesses: []
+            // },
+            // include: {
+            //     state: true
+            // }
         });
         res.status(201).json(newGame);
     } catch (error) {
