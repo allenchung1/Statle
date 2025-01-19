@@ -21,8 +21,7 @@ export const putGuess = async (req, res, next) => {
     try {
         // verify the guess
         const { guess, gameId } = req.body;
-        console.log('GAME ID:', gameId)
-        const guessResult = await prisma.state.findFirst({
+        const guessedState = await prisma.state.findFirst({
             where: { 
                 name: {
                     equals: guess,
@@ -30,7 +29,7 @@ export const putGuess = async (req, res, next) => {
                 }, 
             },
         });
-        if (!guessResult) {
+        if (!guessedState) {
             return res.json(null)
         }
         //submit the guess to the game model and check if correct
@@ -45,20 +44,25 @@ export const putGuess = async (req, res, next) => {
                 state: true
             }
         });
-        console.log(updatedGame)
-        if (guessResult.id === updatedGame.stateId) {
-            return res.json({ correct: true, guessResult, updatedGame })
+        if (guessedState.id === updatedGame.stateId) {
+            return res.json({ correct: true, guessedState, updatedGame })
         }
-        res.status(201).json({ correct: false, guessResult, updatedGame });
+        res.status(201).json({ correct: false, guessedState, updatedGame });
     } catch (error) {
         return next(error);
     }
 }
 
-export const getGameStatus = async (req, res, next) => {
+export const getAnswer = async (req, res, next) => {
     try {
-        const { game } = req.body;
-        // const searchResults = await Search.find
+        const { gameId } = req.body;
+        const answer = await prisma.game.findFirst({
+            where: { id: gameId },
+            include: {
+                state: true
+            }
+        })
+        res.json(answer);
     } catch (error) {
         return next(error);
     }

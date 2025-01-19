@@ -72,12 +72,12 @@ export const InstructionModal = ({ isOpen, onClose }) => {
   );
 };
 
-export const WinModal = ({ isOpen, onClose }) => {
+export const WinModal = ({ isOpen, onClose, answer}) => {
   return (
     <Modal open={isOpen} onClose={onClose}>
       <Box sx={modalStyle}>
-        <Typography variant="h4" sx={{ fontFamily: 'Trebuchet MS', textAlign: 'center', color: 'white' }} >
-          Congratulations! You won!
+        <Typography variant="h4" sx={{ fontFamily: 'Trebuchet MS', textAlign: 'center', color: 'white', whiteSpace: 'pre-wrap', }} >
+          {`Congratulations! You won!\n The state was: ${answer.name}.`}
         </Typography>
         <Link to="https://donorbox.org/keep-statle-alive-1" target="_blank" rel="noopener noreferrer">
           <Button 
@@ -103,12 +103,12 @@ export const WinModal = ({ isOpen, onClose }) => {
   )
 }
 
-export const LoseModal = ({ isOpen, onClose }) => {
+export const LoseModal = ({ isOpen, onClose, answer }) => {
   return (
     <Modal open={isOpen} onClose={onClose}>
       <Box sx={modalStyle}>
-        <Typography variant="h4" sx={{ fontFamily: 'Trebuchet MS', textAlign: 'center', color: 'white' }} gutterBottom >
-          You lost! Better luck next time.
+        <Typography variant="h4" sx={{ fontFamily: 'Trebuchet MS', textAlign: 'center', color: 'white', whiteSpace: 'pre-wrap', }} gutterBottom >
+          {`You lost!\n The answer was: ${answer.name}.\nBetter luck next time.`}
         </Typography>
         <Link to="https://donorbox.org/keep-statle-alive-1" target="_blank" rel="noopener noreferrer">
           <Button 
@@ -133,5 +133,3 @@ export const LoseModal = ({ isOpen, onClose }) => {
     </Modal>
   )
 }
-// export default InstructionModal;
-// export default WinModal;

@@ -8,6 +8,6 @@ export const getSearchResults = async (searchTerm) => API.get(`/search`, { param
 
 export const putGuess = async(guess) => API.put('/game/guess', guess); //post the guess to the server
 
-export const getGameStatus = async() => API.get('/game/status'); //get the random state for the game
+export const getAnswer = async() => API.get('/game/answer'); //get the random state for the game
 
 export const postGame = async() => API.post('/game'); //get the random state for the game

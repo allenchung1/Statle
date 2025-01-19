@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { InstructionModal, LoseModal, WinModal } from './components/Modal';
 import GameTable from './components/GameTable';
 import { Typography, TextField, Button, Autocomplete } from '@mui/material';
-import { getSearchResults, putGuess, getGameStatus, postGame } from './api';
+import { getSearchResults, putGuess, getAnswer, postGame } from './api';
 
 function App() {
   const [isInstructionModalOpen, setIsInstructionModalOpen] = useState(false);
@@ -13,8 +13,14 @@ function App() {
   const [searchResults, setSearchResults] = useState([]);
   const [guesses, setGuesses] = useState([]);
   const [gameId, setGameId] = useState(null);
-  const [win, setWin] = useState(false) // disable autocomplete
-  const [lose, setLose] = useState(false) // disable autocomplete
+  const [win, setWin] = useState(false)
+  const [lose, setLose] = useState(false)
+  const [answer, setAnswer] = useState({})
+
+  const [lastRequestTime, setLastRequestTime] = useState(0); //used to set guess cooldown
+  const [isRequesting, setIsRequesting] = useState(false); //used to set guess cooldown
+
+  const hasStartedGame = useRef(false); //ensure that only one game starts
 
   const handleLookUp = (e, newValue) => {
     const value = newValue || '';
@@ -22,20 +28,50 @@ function App() {
   };
 
   const makeGuess = (e) => {
+    const now = Date.now();
+    const timeDifference = now - lastRequestTime;
+    const minRequestInterval = 300;
+    if (timeDifference < minRequestInterval || isRequesting) {
+      console.log("Please wait before making another guess.");
+      return;
+    }
+    setIsRequesting(true)
+
     putGuess({ guess: inputText, gameId: gameId }).then((res) => {
       if (res.data) {
-        if (res.data.correct == true)  {
-          setIsWinModalOpen(true)
-        } else if (res.data.updatedGame.guesses.length == 5) {
-          setIsLoseModalOpen(true)
+        if (res.data.correct === true)  {
+          setWin(true)
+        } else if (res.data.updatedGame.guesses.length === 5) {
+          setLose(true)
         }
         console.log('Guess submitted', res.data);
-        console.log('test')
-        setGuesses([...guesses, res.data.guessResult]);
-        //setGuesses(res.data.guesses)
+        setGuesses([...guesses, res.data.guessedState]);
       }
-    });
+      setLastRequestTime(now);
+      setIsRequesting(false);
+    }).catch((error) => {
+      setIsRequesting(false)
+    })
   };
+
+  useEffect(() => {
+    if (win) {
+      setIsWinModalOpen(true);
+      getAnswer({ gameId: gameId }).then((res) => {
+        setAnswer(res.data.state)
+      });
+      
+    }
+  }, [win]);
+
+  useEffect(() => {
+    if (lose) {
+      setIsLoseModalOpen(true);
+      getAnswer({ gameId: gameId }).then((res) => {
+        setAnswer(res.data.state)
+      });
+    }
+  }, [lose]);
 
   useEffect(() => {
     if (inputText) {
@@ -48,12 +84,14 @@ function App() {
   }, [inputText]);
   
   useEffect(() => {
-    // set up game: choose a random state for the game
-    postGame().then((res) => {
-      console.log('Game started, this is the game:', res.data);
-      setGameId(res.data.id)
-    });
-    setIsInstructionModalOpen(true);
+    if (!hasStartedGame.current) {
+      hasStartedGame.current = true;
+      postGame().then((res) => {
+        console.log('Game started, this is the game:', res.data);
+        setGameId(res.data.id)
+      });
+      setIsInstructionModalOpen(true);
+    }
   }, []);
 
   return (
@@ -87,6 +125,7 @@ function App() {
           onInputChange={handleLookUp}
           value={inputText}
           onChange={handleLookUp}
+          disabled={win || lose}
           options={searchResults.map((state) => state.name)}
           sx={{
             width: '25%',
@@ -148,8 +187,8 @@ function App() {
         </Button>
         <InstructionModal isOpen={isInstructionModalOpen} onClose={() => setIsInstructionModalOpen(false)} />
         <GameTable guesses={guesses}/>
-        <WinModal isOpen={isWinModalOpen} onClose={() => setIsWinModalOpen(false)} />
-        <LoseModal isOpen={isLoseModalOpen} onClose={() => setIsLoseModalOpen(false)} />
+        <WinModal isOpen={isWinModalOpen} onClose={() => setIsWinModalOpen(false)} answer={answer} />
+        <LoseModal isOpen={isLoseModalOpen} onClose={() => setIsLoseModalOpen(false)} answer={answer} />
       </div>
     </BrowserRouter>
   );
