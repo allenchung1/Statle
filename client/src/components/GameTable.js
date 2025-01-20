@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableRow, Paper, TableContainer } from '@mui/material';
 
-const GameTable = ({ guesses }) => {
+const GameTable = ({ guesses, answer }) => {
   const GameTableHeader = () => {
     return (
       <TableHead>
@@ -15,16 +15,111 @@ const GameTable = ({ guesses }) => {
     );
   };
 
-  const GameTableBody = () => {//green: 0,100,0 yellow: 200,160,10
+  const colorMap =  (guessValue, answerValue, key) => {
+    if (key === 'exact') {
+      if (guessValue === answerValue) {
+        return 'rgb(0,100,0)';
+      } else {
+        return 'rgb(100,0,0)';
+      }
+    } else if (key === 'range') {
+      if (guessValue === answerValue) {
+        return 'rgb(0,100,0)';
+      } else if (Math.abs(guessValue - answerValue) / answerValue <= 0.25) {
+        return 'rgb(200,160,10)';
+      } else {
+        return 'rgb(100,0,0)';
+      }
+    }
+  };
+
+  const higherOrLower = (guessValue, answerValue) => {
+    if (answerValue > guessValue) {
+      return '⬆';
+    } else if (answerValue < guessValue) {
+      return '⬇';
+    } else {
+      return '';
+    }
+  };
+
+  const GameTableBody = () => {
     return (
       <TableBody>
         {guesses.map((guess, index) => (
-          <TableRow key={index} sx={{ backgroundColor: 'black', height: 100, border: '2px solid white' }}>
-            <TableCell align="center" sx={{ color: 'white', fontSize: 30, fontWeight: 'bold' }}>{guess.name}</TableCell>
-            <TableCell align="center" sx={{ color: 'white', fontSize: 30, fontWeight: 'bold' }}>{guess.population}</TableCell>
-            <TableCell align="center" sx={{ color: 'white', fontSize: 30, fontWeight: 'bold' }}>{guess.size}</TableCell>
-            <TableCell align="center" sx={{ color: 'white', fontSize: 30, fontWeight: 'bold' }}>{guess.gdp}</TableCell>
-            <TableCell align="center" sx={{ color: 'white', fontSize: 30, fontWeight: 'bold' }}>{guess.region}</TableCell>
+          <TableRow 
+            key={index} 
+            sx={{ 
+              backgroundColor: 'black', 
+              height: 100, 
+              border: '2px solid white' 
+            }}
+          >
+            <TableCell 
+              align="center" 
+              sx={{ 
+                backgroundColor: colorMap(guess.name, answer.name, 'exact'), 
+                color: 'white', 
+                fontSize: 30, 
+                fontWeight: 'bold',
+                borderRight: '2px solid white',
+                borderLeft: '2px solid white',
+              }}
+            >
+              {guess.name}
+            </TableCell>
+            <TableCell 
+              align="center" 
+              sx={{ 
+                backgroundColor: colorMap(guess.population, answer.population, 'range'), 
+                color: 'white', 
+                fontSize: 30, 
+                fontWeight: 'bold',
+                borderRight: '2px solid white',
+                borderLeft: '2px solid white',
+              }}
+            >
+              {guess.population + ' ' + higherOrLower(guess.population, answer.population)}
+            </TableCell>
+            <TableCell 
+              align="center" 
+              sx={{ 
+                backgroundColor: colorMap(guess.size, answer.size, 'range'), 
+                color: 'white', 
+                fontSize: 30, 
+                fontWeight: 'bold',
+                borderRight: '2px solid white',
+                borderLeft: '2px solid white',
+              }}
+            >
+              {guess.size + ' ' + higherOrLower(guess.size, answer.size)}
+            </TableCell>
+            <TableCell 
+              align="center" 
+              sx={{ 
+                backgroundColor: colorMap(guess.gdp, answer.gdp, 'range'), 
+                color: 'white', 
+                fontSize: 30, 
+                fontWeight: 'bold',
+                borderRight: '2px solid white',
+                borderLeft: '2px solid white',
+              }}
+            >
+              {guess.gdp + ' ' + higherOrLower(guess.gdp, answer.gdp)}
+            </TableCell>
+            <TableCell 
+              align="center" 
+              sx={{ 
+                backgroundColor: colorMap(guess.region, answer.region, 'exact'), 
+                color: 'white', 
+                fontSize: 30, 
+                fontWeight: 'bold',
+                borderRight: '2px solid white',
+                borderLeft: '2px solid white',
+              }}
+            >
+              {guess.region}
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>

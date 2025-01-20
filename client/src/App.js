@@ -3,7 +3,8 @@ import { BrowserRouter } from 'react-router-dom';
 import { InstructionModal, LoseModal, WinModal } from './components/Modal';
 import GameTable from './components/GameTable';
 import { Typography, TextField, Button, Autocomplete } from '@mui/material';
-import { getSearchResults, putGuess, getAnswer, postGame } from './api';
+import { getSearchResults, putGuess, postGame } from './api';
+import Confetti from 'react-confetti';
 
 function App() {
   const [isInstructionModalOpen, setIsInstructionModalOpen] = useState(false);
@@ -13,10 +14,9 @@ function App() {
   const [searchResults, setSearchResults] = useState([]);
   const [guesses, setGuesses] = useState([]);
   const [gameId, setGameId] = useState(null);
-  const [win, setWin] = useState(false)
-  const [lose, setLose] = useState(false)
-  const [answer, setAnswer] = useState({})
-
+  const [answer, setAnswer] = useState({});
+  const [win, setWin] = useState(false);
+  const [lose, setLose] = useState(false);
   const [lastRequestTime, setLastRequestTime] = useState(0); //used to set guess cooldown
   const [isRequesting, setIsRequesting] = useState(false); //used to set guess cooldown
 
@@ -27,51 +27,42 @@ function App() {
     setInputText(value);
   };
 
+  const setUpGame = () => {
+    postGame().then((res) => {
+      setGameId(res.data.id);
+      setAnswer(res.data.state);
+      setWin(false);
+      setLose(false);
+      setGuesses([]);
+    });
+  };
+
   const makeGuess = (e) => {
     const now = Date.now();
     const timeDifference = now - lastRequestTime;
     const minRequestInterval = 300;
     if (timeDifference < minRequestInterval || isRequesting) {
-      console.log("Please wait before making another guess.");
       return;
     }
-    setIsRequesting(true)
+    setIsRequesting(true);
 
     putGuess({ guess: inputText, gameId: gameId }).then((res) => {
       if (res.data) {
-        if (res.data.correct === true)  {
-          setWin(true)
+        if (res.data.correct === true) {
+          setWin(true);
+          setIsWinModalOpen(true);
         } else if (res.data.updatedGame.guesses.length === 5) {
-          setLose(true)
+          setLose(true);
+          setIsLoseModalOpen(true);
         }
-        console.log('Guess submitted', res.data);
         setGuesses([...guesses, res.data.guessedState]);
       }
       setLastRequestTime(now);
       setIsRequesting(false);
     }).catch((error) => {
-      setIsRequesting(false)
-    })
+      setIsRequesting(false);
+    });
   };
-
-  useEffect(() => {
-    if (win) {
-      setIsWinModalOpen(true);
-      getAnswer({ gameId: gameId }).then((res) => {
-        setAnswer(res.data.state)
-      });
-      
-    }
-  }, [win]);
-
-  useEffect(() => {
-    if (lose) {
-      setIsLoseModalOpen(true);
-      getAnswer({ gameId: gameId }).then((res) => {
-        setAnswer(res.data.state)
-      });
-    }
-  }, [lose]);
 
   useEffect(() => {
     if (inputText) {
@@ -86,10 +77,7 @@ function App() {
   useEffect(() => {
     if (!hasStartedGame.current) {
       hasStartedGame.current = true;
-      postGame().then((res) => {
-        console.log('Game started, this is the game:', res.data);
-        setGameId(res.data.id)
-      });
+      setUpGame();
       setIsInstructionModalOpen(true);
     }
   }, []);
@@ -107,6 +95,7 @@ function App() {
           gap: 25,
         }}
       >
+        {win && <Confetti run={win} numberOfPieces={150} />}
         <Typography 
           variant="h1"
           sx={{ 
@@ -118,14 +107,14 @@ function App() {
         >
           STATLE
         </Typography>
-        <Autocomplete
-          freeSolo
+        <Autocomplete 
+          freeSolo 
           disableClearable
           inputValue={inputText}
           onInputChange={handleLookUp}
           value={inputText}
           onChange={handleLookUp}
-          disabled={win || lose}
+          disabled={isWinModalOpen || isLoseModalOpen}
           options={searchResults.map((state) => state.name)}
           sx={{
             width: '25%',
@@ -155,7 +144,6 @@ function App() {
                   makeGuess(e);
                 }
               }}
-
               sx={{
                 width: '100%',
                 '& .MuiFormLabel-root': {
@@ -175,23 +163,45 @@ function App() {
         <Button
           variant='contained'
           onClick={makeGuess}
+          disabled={isWinModalOpen || isLoseModalOpen}
           sx={{
             height: 50, 
             width: 150,
             fontSize: 20,
             backgroundColor: 'rgb(150,150,150)',
             color: 'white',
+            '&:hover': {
+              backgroundColor: 'rgb(50, 50, 50)',
+            },
           }}
         >
           GUESS
         </Button>
-        <InstructionModal isOpen={isInstructionModalOpen} onClose={() => setIsInstructionModalOpen(false)} />
-        <GameTable guesses={guesses}/>
-        <WinModal isOpen={isWinModalOpen} onClose={() => setIsWinModalOpen(false)} answer={answer} />
-        <LoseModal isOpen={isLoseModalOpen} onClose={() => setIsLoseModalOpen(false)} answer={answer} />
+        <InstructionModal isOpen={isInstructionModalOpen} onClose={() => setIsInstructionModalOpen(false)}/>
+        <GameTable guesses={guesses} answer={answer}/>
+        <WinModal isOpen={isWinModalOpen} onClose={() => setIsWinModalOpen(false)} answer={answer} setUpGame={setUpGame}/>
+        <LoseModal isOpen={isLoseModalOpen} onClose={() => setIsLoseModalOpen(false)} answer={answer} setUpGame={setUpGame}/>
+        {(win || lose) && <Button 
+          variant="contained" 
+          sx={{ 
+            height: '50px', 
+            width: '200px', 
+            fontSize: '25px',
+            backgroundColor: 'rgb(100, 100, 100)',
+            color: 'white',
+            '&:hover': {
+              backgroundColor: 'rgb(50, 50, 50)',
+            },
+          }}
+          onClick={() => {
+            setUpGame();
+          }}
+        >
+          RESTART
+        </Button>}
       </div>
     </BrowserRouter>
   );
-}
+};
 
 export default App;

@@ -53,26 +53,9 @@ export const putGuess = async (req, res, next) => {
     }
 }
 
-export const getAnswer = async (req, res, next) => {
-    try {
-        const { gameId } = req.body;
-        const answer = await prisma.game.findFirst({
-            where: { id: gameId },
-            include: {
-                state: true
-            }
-        })
-        res.json(answer);
-    } catch (error) {
-        return next(error);
-    }
-}
-
 export const postGame = async (req, res, next) => {
     try {
         await prisma.game.deleteMany();
-        // const states = await prisma.state.findMany();
-        // const randomState = states[Math.floor(Math.random() * states.length)];
         const randomState = await prisma.state.findFirst({
             skip: Math.floor(Math.random() * 50),
         });
@@ -84,13 +67,9 @@ export const postGame = async (req, res, next) => {
                 },
                 guesses: []
             },
-            // data: {
-            //     stateId: randomState.id, // Set the stateId directly
-            //     guesses: []
-            // },
-            // include: {
-            //     state: true
-            // }
+            include: {
+                state: true
+            }
         });
         res.status(201).json(newGame);
     } catch (error) {

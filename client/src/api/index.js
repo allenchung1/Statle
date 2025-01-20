@@ -6,8 +6,6 @@ const API = axios.create({
 
 export const getSearchResults = async (searchTerm) => API.get(`/search`, { params: { query: searchTerm } }); //get the search results from the server
 
-export const putGuess = async(guess) => API.put('/game/guess', guess); //post the guess to the server
+export const putGuess = async(guess) => API.put('/game/guess', guess); //put a guess to the server
 
-export const getAnswer = async() => API.get('/game/answer'); //get the random state for the game
-
-export const postGame = async() => API.post('/game'); //get the random state for the game
+export const postGame = async() => API.post('/game'); //start a game and pick a random state

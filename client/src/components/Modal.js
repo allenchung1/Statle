@@ -17,6 +17,7 @@ const modalStyle = {
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
+  overflow: 'auto',
 };
 
 export const InstructionModal = ({ isOpen, onClose }) => {
@@ -28,8 +29,10 @@ export const InstructionModal = ({ isOpen, onClose }) => {
         </Typography>
         <Typography variant="h4" sx={{ fontFamily: 'Trebuchet MS', textAlign: 'center', color: 'white' }} gutterBottom >
           Guess the American state in 5 tries.
-          A green color in a column means you are very close or you are correct.
-          A yellow color in the column means you are close.
+          A green color in a column means you are correct.
+          A yellow color in a column means you are close.
+          A red color in a column means you are wrong.
+          Good luck!
         </Typography>
         <Box sx={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 5 }}>
           <Button 
@@ -41,7 +44,7 @@ export const InstructionModal = ({ isOpen, onClose }) => {
               backgroundColor: 'rgb(50, 100, 200)',
               color: 'white',
               '&:hover': {
-                backgroundColor: 'rgb(30, 40, 40)',
+                backgroundColor: 'rgb(50, 50, 50)',
                 },
               }}
               onClick={onClose}
@@ -58,7 +61,7 @@ export const InstructionModal = ({ isOpen, onClose }) => {
               backgroundColor: 'rgb(50, 100, 200)',
               color: 'white',
               '&:hover': {
-                backgroundColor: 'rgb(30,40,40)',
+                backgroundColor: 'rgb(50, 50, 50)',
               },
             }}
             onClick={onClose}
@@ -72,64 +75,104 @@ export const InstructionModal = ({ isOpen, onClose }) => {
   );
 };
 
-export const WinModal = ({ isOpen, onClose, answer}) => {
+export const WinModal = ({ isOpen, onClose, answer, setUpGame }) => {
   return (
     <Modal open={isOpen} onClose={onClose}>
       <Box sx={modalStyle}>
         <Typography variant="h4" sx={{ fontFamily: 'Trebuchet MS', textAlign: 'center', color: 'white', whiteSpace: 'pre-wrap', }} >
           {`Congratulations! You won!\n The state was: ${answer.name}.`}
         </Typography>
-        <Link to="https://donorbox.org/keep-statle-alive-1" target="_blank" rel="noopener noreferrer">
+        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 20 }}>
           <Button 
             variant="contained" 
             sx={{ 
               height: '50px', 
-              width: '200px',
-              fontSize: '25px', 
+              width: '200px', 
+              fontSize: '25px',
               backgroundColor: 'rgb(50, 100, 200)',
               color: 'white',
-              marginTop: 20,
               '&:hover': {
-                backgroundColor: 'rgb(30, 40, 40)',
-              },
-            }}
-            onClick={onClose}
+                backgroundColor: 'rgb(50, 50, 50)',
+                },
+              }}
+              onClick={() => {
+                setUpGame();
+                onClose();
+              }}
           >
-            DONATE!
+            PLAY AGAIN!
           </Button>
-        </Link>
+          <Link to="https://donorbox.org/keep-statle-alive-1" target="_blank" rel="noopener noreferrer">
+            <Button 
+              variant="contained" 
+              sx={{ 
+                height: '50px', 
+                width: '200px',
+                fontSize: '25px', 
+                backgroundColor: 'rgb(50, 100, 200)',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'rgb(50, 50, 50)',
+                },
+              }}
+              onClick={onClose}
+            >
+              DONATE!
+            </Button>
+          </Link>
+        </Box>
       </Box>
     </Modal>
-  )
-}
+  );
+};
 
-export const LoseModal = ({ isOpen, onClose, answer }) => {
+export const LoseModal = ({ isOpen, onClose, answer, setUpGame }) => {
   return (
     <Modal open={isOpen} onClose={onClose}>
       <Box sx={modalStyle}>
         <Typography variant="h4" sx={{ fontFamily: 'Trebuchet MS', textAlign: 'center', color: 'white', whiteSpace: 'pre-wrap', }} gutterBottom >
           {`You lost!\n The answer was: ${answer.name}.\nBetter luck next time.`}
         </Typography>
-        <Link to="https://donorbox.org/keep-statle-alive-1" target="_blank" rel="noopener noreferrer">
+        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 20 }}>
           <Button 
             variant="contained" 
             sx={{ 
               height: '50px', 
-              width: '200px',
-              fontSize: '25px', 
+              width: '200px', 
+              fontSize: '25px',
               backgroundColor: 'rgb(50, 100, 200)',
               color: 'white',
-              marginTop: 20,
               '&:hover': {
-                backgroundColor: 'rgb(30,40,40)',
+                backgroundColor: 'rgb(50, 50, 50)',
               },
             }}
-            onClick={onClose}
+            onClick={() => {
+              setUpGame();
+              onClose();
+            }}
           >
-            DONATE!
+            PLAY AGAIN!
           </Button>
-        </Link>
+          <Link to="https://donorbox.org/keep-statle-alive-1" target="_blank" rel="noopener noreferrer">
+            <Button 
+              variant="contained" 
+              sx={{ 
+                height: '50px', 
+                width: '200px',
+                fontSize: '25px', 
+                backgroundColor: 'rgb(50, 100, 200)',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'rgb(50, 50, 50)',
+                },
+              }}
+              onClick={onClose}
+            >
+              DONATE!
+            </Button>
+          </Link>
+        </Box>
       </Box>
     </Modal>
-  )
-}
+  );
+};
