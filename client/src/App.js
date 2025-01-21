@@ -91,8 +91,8 @@ function App() {
           alignItems: 'center',
           height: '100vh',
           backgroundColor: 'rgb(30,40,40)',
-          padding: 50,
-          gap: 25,
+          padding: 20,
+          gap: 15,
         }}
       >
         <Typography 
