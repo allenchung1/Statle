@@ -113,7 +113,7 @@ function App() {
           onInputChange={handleLookUp}
           value={inputText}
           onChange={handleLookUp}
-          disabled={isWinModalOpen || isLoseModalOpen}
+          disabled={win || lose}
           options={searchResults.map((state) => state.name)}
           sx={{
             width: '25%',
@@ -162,7 +162,7 @@ function App() {
         <Button
           variant='contained'
           onClick={makeGuess}
-          disabled={isWinModalOpen || isLoseModalOpen}
+          disabled={win || lose}
           sx={{
             height: 50, 
             width: 150,
@@ -196,7 +196,7 @@ function App() {
             setUpGame();
           }}
         >
-          RESTART
+          PLAY AGAIN!
         </Button>}
       </div>
     </BrowserRouter>
