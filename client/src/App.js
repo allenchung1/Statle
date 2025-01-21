@@ -4,7 +4,6 @@ import { InstructionModal, LoseModal, WinModal } from './components/Modal';
 import GameTable from './components/GameTable';
 import { Typography, TextField, Button, Autocomplete } from '@mui/material';
 import { getSearchResults, putGuess, postGame } from './api';
-import Confetti from 'react-confetti';
 
 function App() {
   const [isInstructionModalOpen, setIsInstructionModalOpen] = useState(false);
@@ -34,10 +33,11 @@ function App() {
       setWin(false);
       setLose(false);
       setGuesses([]);
+      setInputText('');
     });
   };
 
-  const makeGuess = (e) => {
+  const makeGuess = () => {
     const now = Date.now();
     const timeDifference = now - lastRequestTime;
     const minRequestInterval = 300;
@@ -95,7 +95,6 @@ function App() {
           gap: 25,
         }}
       >
-        {win && <Confetti run={win} numberOfPieces={150} />}
         <Typography 
           variant="h1"
           sx={{ 
@@ -141,7 +140,7 @@ function App() {
               variant="outlined"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
-                  makeGuess(e);
+                  makeGuess();
                 }
               }}
               sx={{

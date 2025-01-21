@@ -21,6 +21,8 @@ model State {
   gdp           Float
   region        String
   game          Game?       @relation
+  fact          String
+  winnerCount   Int
 }
 
 model Game {

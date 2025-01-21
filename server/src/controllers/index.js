@@ -19,7 +19,6 @@ export const getSearchResults = async (req, res, next) => {
 
 export const putGuess = async (req, res, next) => {
     try {
-        // verify the guess
         const { guess, gameId } = req.body;
         const guessedState = await prisma.state.findFirst({
             where: { 
@@ -32,7 +31,6 @@ export const putGuess = async (req, res, next) => {
         if (!guessedState) {
             return res.json(null)
         }
-        //submit the guess to the game model and check if correct
         const updatedGame = await prisma.game.update({
             where: { id: gameId },
             data: {
@@ -72,6 +70,32 @@ export const postGame = async (req, res, next) => {
             }
         });
         res.status(201).json(newGame);
+    } catch (error) {
+        return next(error);
+    }
+}
+
+export const putUserState = async (req, res, next) => {
+    try {
+        const { state } = req.body;
+        const userState = await prisma.state.findFirst({
+            where: { 
+                name: {
+                    equals: state,
+                    mode: 'insensitive',
+                }, 
+            },
+        });
+        if (!userState) {
+            return res.json(null)
+        }
+        const updatedState = await prisma.state.update({
+            where: { id: userState.id },
+            data: {
+                winnerCount: { increment: 1}
+            },
+        })
+        res.json(updatedState)
     } catch (error) {
         return next(error);
     }
