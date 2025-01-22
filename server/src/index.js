@@ -17,6 +17,6 @@ app.get("/", (req, res) => {
     res.send("Server is running...");
 });
 
-app.listen(() => {
+app.listen(PORT, () => {
      console.log(`Server running on https://statle.onrender.com`);
 });
