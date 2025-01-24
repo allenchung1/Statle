@@ -45,7 +45,7 @@ const prisma = new PrismaClient();
 //     { name: "Rhode Island", population: 1112308, size: 1545, gdp: 81911, region: "Northeast", fact: "It's the smallest state but has the longest name: 'The State of Rhode Island and Providence Plantations'", winnerCount: 0 },
 //     { name: "South Carolina", population: 5478831, size: 32020, gdp: 348128, region: "South", fact: "The first battle of the Civil War occurred at Fort Sumter", winnerCount: 0 },
 //     { name: "South Dakota", population: 924669, size: 77116, gdp: 74938, region: "Midwest", fact: "South Dakota has the world's only Corn Palace, decorated with murals made entirely of corn and grains", winnerCount: 0 },
-//     { name: "Tennessee", population: 7227750, size: 42144, gdp: 545695, region: "South", fact: "Bristol, Tennessee, is known as the 'Birthplace of winnerCountry Music'", winnerCount: 0 },
+//     { name: "Tennessee", population: 7227750, size: 42144, gdp: 545695, region: "South", fact: "Bristol, Tennessee, is known as the 'Birthplace of Country Music'", winnerCount: 0 },
 //     { name: "Texas", population: 31290831, size: 268596, gdp: 2694524, region: "South", fact: "Texas is so large that El Paso, on its western edge, is closer to Los Angeles than it is to Houston", winnerCount: 0 },
 //     { name: "Utah", population: 3503613, size: 84897, gdp: 298815, region: "West", fact: "Utah's Bonneville Salt Flats are so flat and expansive they're used for land speed record attempts", winnerCount: 0 },
 //     { name: "Vermont", population: 648493, size: 9616, gdp: 45432, region: "Northeast", fact: "Vermont is the largest producer of maple syrup in the U.S", winnerCount: 0 },
