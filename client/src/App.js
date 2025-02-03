@@ -16,6 +16,7 @@ function App() {
   const [answer, setAnswer] = useState({});
   const [win, setWin] = useState(false);
   const [lose, setLose] = useState(false);
+  const [hasPutState, setHasPutState] = useState(false);
   const [lastRequestTime, setLastRequestTime] = useState(0); //used to set guess cooldown
   const [isRequesting, setIsRequesting] = useState(false); //used to set guess cooldown
 
@@ -34,6 +35,7 @@ function App() {
       setLose(false);
       setGuesses([]);
       setInputText('');
+      setHasPutState(false)
     });
   };
 
@@ -48,6 +50,7 @@ function App() {
 
     putGuess({ guess: inputText, gameId: gameId }).then((res) => {
       if (res.data) {
+        setInputText('');
         if (res.data.correct === true) {
           setWin(true);
           setIsWinModalOpen(true);
@@ -178,7 +181,7 @@ function App() {
         </Button>
         <InstructionModal isOpen={isInstructionModalOpen} onClose={() => setIsInstructionModalOpen(false)}/>
         <GameTable guesses={guesses} answer={answer}/>
-        <WinModal isOpen={isWinModalOpen} onClose={() => setIsWinModalOpen(false)} answer={answer} setUpGame={setUpGame}/>
+        <WinModal isOpen={isWinModalOpen} onClose={() => setIsWinModalOpen(false)} answer={answer} setUpGame={setUpGame} hasPutState={hasPutState} setHasPutState={setHasPutState}/>
         <LoseModal isOpen={isLoseModalOpen} onClose={() => setIsLoseModalOpen(false)} answer={answer} setUpGame={setUpGame}/>
         {(win || lose) && <Button 
           variant="contained" 

@@ -19,7 +19,7 @@ const modalStyle = {
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  overflow: 'auto',
+  overflow: 'hidden',
 };
 
 export const InstructionModal = ({ isOpen, onClose }) => {
@@ -77,10 +77,9 @@ export const InstructionModal = ({ isOpen, onClose }) => {
   );
 };
 
-export const WinModal = ({ isOpen, onClose, answer, setUpGame }) => {
+export const WinModal = ({ isOpen, onClose, answer, setUpGame, hasPutState, setHasPutState }) => {
   const [inputText, setInputText] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const [hasPutState, setHasPutState] = useState(false);
   const [userState, setUserState] = useState({});
 
   const handleLookUp = (e, newValue) => {
@@ -91,6 +90,7 @@ export const WinModal = ({ isOpen, onClose, answer, setUpGame }) => {
   const registerState = () => {
     putUserState({state: inputText }).then((res) => {
       if (res.data) {
+        setInputText('');
         setHasPutState(true);
         setUserState(res.data);
       }
@@ -109,12 +109,12 @@ export const WinModal = ({ isOpen, onClose, answer, setUpGame }) => {
 
   return (
     <Modal open={isOpen} onClose={onClose}>
-      <Box sx={modalStyle}>
+      <Box sx={{...modalStyle, overflow: 'hidden'}}>
       <Confetti/>
-        <Typography variant="h4" sx={{ fontFamily: 'Trebuchet MS', textAlign: 'center', color: 'white', whiteSpace: 'pre-wrap', }}>
+        <Typography variant="h4" sx={{ fontFamily: 'Trebuchet MS', textAlign: 'center', color: 'white', whiteSpace: 'pre-wrap' }}>
           {`Congratulations! You won!\n\n Fun fact: ${answer.fact}.`}
         </Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 10 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 5 }}>
           <Button 
             variant="contained" 
             sx={{ 
@@ -155,60 +155,78 @@ export const WinModal = ({ isOpen, onClose, answer, setUpGame }) => {
             </Button>
           </Link>
         </Box>
-        <Autocomplete 
-          freeSolo
-          disableClearable
-          inputValue={inputText}
-          onInputChange={handleLookUp}
-          value={inputText}
-          onChange={handleLookUp}
-          disabled={hasPutState}
-          options={searchResults.map((state) => state.name)}
-          sx={{
-            marginTop: 5,
-            width: '25%',
-            '& .MuiAutocomplete-inputRoot': {
-              color: 'white', // Text color
-              backgroundColor: 'rgb(50, 50, 50)', // Input field background color
-            },
-            '& .MuiOutlinedInput-root': {
-              '& fieldset': {
-                borderColor: 'white', // Outline color
+        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 5, marginTop: 10 }}>
+          <Autocomplete 
+            freeSolo
+            disableClearable
+            inputValue={inputText}
+            onInputChange={handleLookUp}
+            value={inputText}
+            onChange={handleLookUp}
+            disabled={hasPutState}
+            options={searchResults.map((state) => state.name)}
+            sx={{
+              width: '200px',
+              '& .MuiAutocomplete-inputRoot': {
+                color: 'white', // Text color
+                backgroundColor: 'rgb(50, 50, 50)', // Input field background color
               },
-              '&:hover fieldset': {
-                borderColor: 'white', // Outline color on hover
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: 'white', // Outline color
+                },
+                '&:hover fieldset': {
+                  borderColor: 'white', // Outline color on hover
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: 'white', // Outline color when focused
+                },
               },
-              '&.Mui-focused fieldset': {
-                borderColor: 'white', // Outline color when focused
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Represent your state!"
+                variant="outlined"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    registerState();
+                  }
+                }}
+                sx={{
+                  width: '100%',
+                  '& .MuiFormLabel-root': {
+                    color: 'white', // Label color
+                  },
+                  '& .MuiFormLabel-root.Mui-focused': {
+                    color: 'white', // Label color when focused
+                  },
+                  '& .MuiInputBase-input': {
+                    color: 'white', // Text color
+                    backgroundColor: 'rgb(50, 50, 50)', // Input field background color
+                  },
+                }}
+              />
+            )}
+          />
+          <Button 
+            variant="contained"
+            disabled={hasPutState}
+            sx={{ 
+              height: '50px', 
+              width: '100px',
+              fontSize: '20px', 
+              backgroundColor: 'rgb(100, 100, 100)',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'rgb(50, 50, 50)',
               },
-            },
-          }}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="What state are you from?"
-              variant="outlined"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  registerState();
-                }
-              }}
-              sx={{
-                width: '100%',
-                '& .MuiFormLabel-root': {
-                  color: 'white', // Label color
-                },
-                '& .MuiFormLabel-root.Mui-focused': {
-                  color: 'white', // Label color when focused
-                },
-                '& .MuiInputBase-input': {
-                  color: 'white', // Text color
-                  backgroundColor: 'rgb(50, 50, 50)', // Input field background color
-                },
-              }}
-            />
-          )}
-        />
+            }}
+            onClick={registerState}
+          >
+            Enter!
+          </Button>
+        </Box>
         {hasPutState && 
         <Typography 
           variant="h4" 
